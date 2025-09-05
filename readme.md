@@ -1,225 +1,80 @@
-# 🚀 AI-powered CRM System
+# AI-powered CRM System
 
-<div align="center">
-  
-![AI CRM Logo](https://img.shields.io/badge/AI-CRM%20System-blue?style=for-the-badge&logo=robot&logoColor=white)
+An intelligent customer relationship management system that automates customer feedback analysis for e-commerce platforms using AI and machine learning.
 
-**An intelligent, multi-model AI system designed to revolutionize customer relationship management for e-commerce platforms**
+## Features
 
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=flat&logo=tensorflow&logoColor=white)](https://tensorflow.org/)
-[![LangChain](https://img.shields.io/badge/🦜🔗-LangChain-green)](https://langchain.com/)
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+- **Automated Classification**: Sentiment analysis and ticket categorization using fine-tuned BERT models
+- **Intelligent Q&A**: RAG-powered system answers customer questions using company knowledge base
+- **Topic Discovery**: Identifies trends and patterns in customer feedback
+- **Microservices Architecture**: Scalable design with separate FastAPI services
+- **High Accuracy**: Fine-tuned models for precise classification results
 
-</div>
+## Architecture
 
----
+The system uses a microservices architecture with two main components:
 
-## 📋 Table of Contents
+1. **Classifier Service** (Port 8000): Handles sentiment analysis and ticket categorization
+2. **RAG Service** (Port 8001): Manages Q&A and text summarization
+3. **Main Backend** (Not included): Node.js/Express server for database operations
 
-- [🎯 Overview](#-overview)
-- [✨ Key Features](#-key-features)
-- [🏗️ Architecture](#️-architecture)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [🚀 Getting Started](#-getting-started)
-- [📡 API Documentation](#-api-documentation)
-- [🔮 Future Roadmap](#-future-roadmap)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+## Tech Stack
 
----
+**AI/ML**: TensorFlow, Keras, Hugging Face Transformers, LangChain, Google Gemini, FAISS, BERTopic
 
-## 🎯 Overview
+**Backend**: FastAPI, Uvicorn, Python 3.10+
 
-The **AI-powered CRM System** is a sophisticated customer relationship management solution that leverages cutting-edge AI technologies to automate customer feedback analysis, provide intelligent support responses, and generate actionable business insights for e-commerce platforms like Amazon and Flipkart.
+**Other**: Pydantic, scikit-learn, python-dotenv
 
-### 🎬 System in Action
+## Installation
 
-> *A demo GIF showcasing the admin dashboard would be displayed here*
+### Prerequisites
 
-![Demo Placeholder](https://via.placeholder.com/800x400/0891b2/ffffff?text=🎬+Demo+Coming+Soon)
+- Python 3.10+
+- Google API Key for Gemini API
 
----
-
-## ✨ Key Features
-
-<table>
-<tr>
-<td width="50%">
-
-### 🤖 **Automated Ticket Analysis**
-- **Real-time Classification**: Instantly categorizes customer feedback
-- **Sentiment Analysis**: Detects customer emotions with high accuracy
-- **Smart Routing**: Automatically routes tickets to appropriate departments
-
-### 🧠 **Intelligent Q&A System**
-- **RAG-powered Responses**: Context-aware answers using company knowledge base
-- **Natural Language Processing**: Understands complex customer queries
-- **24/7 Availability**: Round-the-clock automated support
-
-</td>
-<td width="50%">
-
-### 📈 **Strategic Business Intelligence**
-- **Topic Discovery**: Uncovers hidden trends in customer feedback
-- **Actionable Insights**: Transforms data into business decisions
-- **Performance Analytics**: Tracks customer satisfaction metrics
-
-### ⚡ **Enterprise-Ready Architecture**
-- **Microservices Design**: Scalable and maintainable system
-- **High Performance**: FastAPI-powered async processing
-- **Reproducible ML Pipeline**: Complete model training infrastructure
-
-</td>
-</tr>
-</table>
-
----
-
-## 🏗️ Architecture
-
-Our system follows a **microservices architecture** designed for scalability and maintainability:
-
-<div align="center">
-
-```mermaid
-graph TB
-    A[Client Application] --> B[Node.js/Express Backend]
-    B --> C[Classifier Service<br/>:8000]
-    B --> D[RAG Service<br/>:8001]
-    
-    C --> E[(TensorFlow Models)]
-    C --> F[BERT Sentiment Classifier]
-    C --> G[Ticket Category Classifier]
-    
-    D --> H[(Vector Database)]
-    D --> I[LangChain RAG Pipeline]
-    D --> J[Google Gemini API]
-    
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style C fill:#fff3e0
-    style D fill:#e8f5e8
-```
-
-</div>
-
-### 🔧 Service Breakdown
-
-| Service | Port | Purpose | Tech Stack |
-|---------|------|---------|------------|
-| **Classifier Service** | 8000 | Sentiment & Category Analysis | TensorFlow 2.12, BERT, scikit-learn |
-| **RAG Service** | 8001 | Q&A & Summarization | LangChain, FAISS, Google Gemini |
-| **Main Backend** | 3000 | API Gateway & Database | Node.js, Express, MongoDB |
-
----
-
-## 🛠️ Tech Stack
-
-<div align="center">
-
-### 🧠 AI & Machine Learning
-![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
-![Hugging Face](https://img.shields.io/badge/🤗%20Hugging%20Face-FFD21E?style=for-the-badge&logoColor=black)
-![LangChain](https://img.shields.io/badge/🦜🔗%20LangChain-121212?style=for-the-badge&logoColor=white)
-
-### 🔧 Backend & APIs
-![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
-
-### 🗄️ Data & Storage
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
-![FAISS](https://img.shields.io/badge/FAISS-0467DF?style=for-the-badge&logoColor=white)
-
-</div>
-
----
-
-## 🚀 Getting Started
-
-### 📋 Prerequisites
-
-Before you begin, ensure you have:
-
-- ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)
-- ![Google](https://img.shields.io/badge/Google%20API%20Key-4285F4?style=flat&logo=google&logoColor=white) for Gemini API
-- ![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white)
-
-### 🔧 Installation
-
-#### 1️⃣ **Classifier Service Setup**
+### 1. Classifier Service
 
 ```bash
-# Navigate to classifier service
 cd classifier_service
-
-# Create virtual environment
 python -m venv venv_tf
-# Windows
-venv_tf\Scripts\activate
-# macOS/Linux
-source venv_tf/bin/activate
-
-# Install dependencies
+venv_tf\Scripts\activate  # Windows
+# source venv_tf/bin/activate  # macOS/Linux
 pip install -r requirements.txt
-
-# Download pre-trained models (Option A - Recommended)
-# Models will be available on Hugging Face Hub
-# Or train from scratch using the provided notebooks (Option B)
-
-# Start the service
 python run.py
 ```
 
-> 🟢 **Service running at**: `http://127.0.0.1:8000`
+Service runs at: `http://127.0.0.1:8000`
 
-#### 2️⃣ **RAG Service Setup**
+### 2. RAG Service
 
 ```bash
-# Navigate to RAG service
 cd rag_service
-
-# Create virtual environment
 python -m venv venv_rag
-# Windows
-venv_rag\Scripts\activate
-# macOS/Linux
-source venv_rag/bin/activate
-
-# Install dependencies
+venv_rag\Scripts\activate  # Windows
+# source venv_rag/bin/activate  # macOS/Linux
 pip install -r requirements.txt
-
-# Configure environment
 echo 'GOOGLE_API_KEY="your_api_key_here"' > .env
-
-# Build knowledge base
 python build_rag_index.py
-
-# Start the service
 python run.py
 ```
 
-> 🟢 **Service running at**: `http://127.0.0.1:8001`
+Service runs at: `http://127.0.0.1:8001`
 
----
+## API Endpoints
 
-## 📡 API Documentation
+### Classifier Service (localhost:8000)
 
-### 🔍 Classifier Service Endpoints
+**POST /api/analyze** - Analyze customer feedback
 
-<details>
-<summary><strong>POST /api/analyze</strong> - Analyze customer feedback</summary>
-
-**Request:**
+Request:
 ```json
 {
-  "text": "My order arrived broken, I need a replacement immediately!"
+  "text": "My order arrived broken, I need a replacement."
 }
 ```
 
-**Response:**
+Response:
 ```json
 {
   "sentiment": {
@@ -233,103 +88,57 @@ python run.py
 }
 ```
 
-</details>
+### RAG Service (localhost:8001)
 
-### 🧠 RAG Service Endpoints
+**POST /api/ask-rag** - Get answers from knowledge base
 
-<details>
-<summary><strong>POST /api/ask-rag</strong> - Get intelligent answers</summary>
-
-**Request:**
+Request:
 ```json
 {
-  "question": "What is your return policy for damaged items?"
+  "question": "How long do I have to return a damaged item?"
 }
 ```
 
-**Response:**
+**POST /api/summarize** - Summarize long text
+
+Request:
 ```json
 {
-  "answer": "You can return damaged items within 30 days of purchase. We offer free return shipping and full refunds for manufacturing defects.",
-  "confidence": 0.89,
-  "sources": ["return_policy.pdf", "customer_handbook.pdf"]
+  "text": "Long customer feedback text..."
 }
 ```
 
-</details>
+## Models
 
-<details>
-<summary><strong>POST /api/summarize</strong> - Summarize long content</summary>
+The system includes two fine-tuned BERT models:
+- Sentiment Analysis Model
+- Ticket Category Classifier
 
-**Request:**
-```json
-{
-  "text": "Long customer feedback text here..."
-}
+Models can be downloaded from Hugging Face Hub or trained from scratch using the provided Jupyter notebooks.
+
+## Project Structure
+
+```
+ai-crm-system/
+├── classifier_service/
+│   ├── models/
+│   ├── requirements.txt
+│   └── run.py
+├── rag_service/
+│   ├── rag_docs/
+│   ├── requirements.txt
+│   ├── build_rag_index.py
+│   └── run.py
+└── README.md
 ```
 
-**Response:**
-```json
-{
-  "summary": "Customer experienced shipping delay but praised product quality and customer service response.",
-  "key_points": ["shipping delay", "product satisfaction", "good support"]
-}
-```
+## Future Development
 
-</details>
+- Integration with MongoDB database
+- Complete MERN stack admin dashboard
+- Docker containerization
+- Extended e-commerce platform support
 
----
+## License
 
-## 🔮 Future Roadmap
-
-<div align="center">
-
-| Phase | Features | Timeline |
-|-------|----------|----------|
-| **Phase 1** ✅ | Core AI Services | **Completed** |
-| **Phase 2** 🚧 | Full MERN Dashboard | **Q2 2025** |
-| **Phase 3** 📅 | Docker Containerization | **Q3 2025** |
-| **Phase 4** 📅 | Advanced Analytics | **Q4 2025** |
-
-</div>
-
-### 🎯 Upcoming Features
-
-- 📊 **Interactive Dashboard**: Complete MERN stack admin panel
-- 🐳 **Containerization**: Docker support for easy deployment
-- 📈 **Advanced Analytics**: Real-time performance metrics
-- 🔗 **Third-party Integrations**: Shopify, WooCommerce support
-- 🌐 **Multi-language Support**: Global customer base coverage
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-<div align="center">
-
-[![Contributors](https://img.shields.io/github/contributors/yourusername/ai-crm-system?style=for-the-badge)](https://github.com/yourusername/ai-crm-system/graphs/contributors)
-[![Issues](https://img.shields.io/github/issues/yourusername/ai-crm-system?style=for-the-badge)](https://github.com/yourusername/ai-crm-system/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/yourusername/ai-crm-system?style=for-the-badge)](https://github.com/yourusername/ai-crm-system/pulls)
-
-</div>
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-<div align="center">
-
-**⭐ If this project helped you, please consider giving it a star! ⭐**
-
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/ai-crm-system?style=social)](https://github.com/yourusername/ai-crm-system/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/ai-crm-system?style=social)](https://github.com/yourusername/ai-crm-system/network/members)
-
-**Made with ❤️ for the e-commerce community**
-
-</div>
+This project is licensed under the MIT License.
