@@ -1,144 +1,152 @@
 # AI-powered CRM System
 
-An intelligent customer relationship management system that automates customer feedback analysis for e-commerce platforms using AI and machine learning.
+An intelligent, multi-model AI system designed to automate the analysis of customer feedback for e-commerce platforms like Amazon and Flipkart. This project leverages fine-tuned BERT models for high-accuracy classification and a Retrieval-Augmented Generation (RAG) engine for automated, context-aware customer support.
 
-## Features
+## Core Features
 
-- **Automated Classification**: Sentiment analysis and ticket categorization using fine-tuned BERT models
-- **Intelligent Q&A**: RAG-powered system answers customer questions using company knowledge base
-- **Topic Discovery**: Identifies trends and patterns in customer feedback
-- **Microservices Architecture**: Scalable design with separate FastAPI services
-- **High Accuracy**: Fine-tuned models for precise classification results
+🤖 **Automated Ticket Analysis**: Instantly classifies incoming customer feedback for sentiment and ticket category with high accuracy.
 
-## Architecture
+🧠 **Intelligent Q&A**: A RAG engine answers customer questions using a knowledge base of company documents, providing accurate, context-aware responses.
 
-The system uses a microservices architecture with two main components:
+📈 **Strategic Insights**: Discovers hidden topics and trends from customer feedback to provide actionable business intelligence.
 
-1. **Classifier Service** (Port 8000): Handles sentiment analysis and ticket categorization
-2. **RAG Service** (Port 8001): Manages Q&A and text summarization
-3. **Main Backend** (Not included): Node.js/Express server for database operations
+⚡ **Scalable Microservices Architecture**: Built with two independent FastAPI services to handle ML and RAG tasks separately, ensuring robustness and resolving dependency conflicts.
+
+✅ **Reproducible ML Pipeline**: Includes all scripts and notebooks to reproduce the fine-tuned models and RAG index from scratch.
+
+## Architecture Overview
+
+The backend is built on a microservices architecture to ensure stability and scalability. This professional approach resolves Python's "dependency hell" by isolating older ML libraries from modern RAG libraries.
+
+**Classifier Service**: A dedicated FastAPI service running on a TensorFlow 2.12 stack. It handles all classification tasks (Sentiment and Ticket Category).
+
+**RAG & Summarization Service**: A separate FastAPI service running on a modern LangChain stack. It manages the vector store and handles all generative AI tasks (Q&A and Summarization).
+
+**Express/Node.js Backend** (Not included in this repo): The main application server that would handle database interactions and communicate with these two AI services.
 
 ## Tech Stack
 
-**AI/ML**: TensorFlow, Keras, Hugging Face Transformers, LangChain, Google Gemini, FAISS, BERTopic
+### AI / Machine Learning
+- **TensorFlow & Keras**: For fine-tuning classification models.
+- **Hugging Face Transformers**: For leveraging pre-trained BERT models.
+- **LangChain**: For orchestrating the RAG and summarization pipelines.
+- **Google Gemini**: For embeddings and generative AI.
+- **FAISS**: For high-speed vector storage and retrieval.
+- **BERTopic**: For unsupervised topic discovery.
 
-**Backend**: FastAPI, Uvicorn, Python 3.10+
+### Backend
+- **FastAPI**: For building the high-performance, asynchronous APIs.
+- **Uvicorn**: As the ASGI server.
 
-**Other**: Pydantic, scikit-learn, python-dotenv
+### Python Libraries
+- **Pydantic**: For data validation.
+- **scikit-learn**: For model evaluation.
+- **python-dotenv**: For environment variable management.
 
-## Installation
+## Getting Started
+
+This repository contains two separate services. Please follow the setup instructions for each.
 
 ### Prerequisites
+- Python 3.10
+- A GOOGLE_API_KEY for the Gemini API.
 
-- Python 3.10+
-- Google API Key for Gemini API
+### 1. The Classifier Service
 
-### 1. Classifier Service
+This service runs the Sentiment and Ticket Classifier models.
 
+Navigate to the classifier_service directory:
 ```bash
 cd classifier_service
+```
+
+Create and activate a virtual environment:
+```bash
 python -m venv venv_tf
-venv_tf\Scripts\activate  # Windows
-# source venv_tf/bin/activate  # macOS/Linux
+venv_tf\Scripts\activate
+```
+
+Install the required dependencies:
+```bash
 pip install -r requirements.txt
+```
+
+**Get the Models:**
+- **Option A (Recommended)**: Download the fine-tuned models from the Hugging Face Hub and place them in the `classifier_service/models/` directory.
+- **Option B (Reproduce)**: Run the training notebooks (`Sentiment Analysis.ipynb`, `Ticket Classifier.ipynb`) to fine-tune and save the models from scratch.
+
+Run the service:
+```bash
 python run.py
 ```
 
-Service runs at: `http://127.0.0.1:8000`
+The service will be available at http://127.0.0.1:8000.
 
-### 2. RAG Service
+### 2. The RAG & Summarization Service
 
+This service runs the Q&A and Summarization models.
+
+Navigate to the rag_service directory:
 ```bash
 cd rag_service
+```
+
+Create and activate a new virtual environment:
+```bash
 python -m venv venv_rag
-venv_rag\Scripts\activate  # Windows
-# source venv_rag/bin/activate  # macOS/Linux
+venv_rag\Scripts\activate
+```
+
+Install the required dependencies:
+```bash
 pip install -r requirements.txt
-echo 'GOOGLE_API_KEY="your_api_key_here"' > .env
+```
+
+Create a .env file in this directory and add your API key:
+```
+GOOGLE_API_KEY="YOUR_API_KEY_HERE"
+```
+
+Build the Knowledge Base: The source documents are in the rag_docs folder. Run the build script to create the searchable index:
+```bash
 python build_rag_index.py
+```
+
+Run the service:
+```bash
 python run.py
 ```
 
-Service runs at: `http://127.0.0.1:8001`
+The service will be available at http://127.0.0.1:8001.
 
 ## API Endpoints
 
 ### Classifier Service (localhost:8000)
 
-**POST /api/analyze** - Analyze customer feedback
+**POST /api/analyze**: Takes text and returns sentiment and ticket category predictions.
 
-Request:
+Example Request:
 ```json
 {
   "text": "My order arrived broken, I need a replacement."
 }
 ```
 
-Response:
-```json
-{
-  "sentiment": {
-    "label": "negative",
-    "confidence": 0.92
-  },
-  "category": {
-    "label": "product_quality",
-    "confidence": 0.87
-  }
-}
-```
-
 ### RAG Service (localhost:8001)
 
-**POST /api/ask-rag** - Get answers from knowledge base
+**POST /api/ask-rag**: Takes a question and returns an answer from the knowledge base.
 
-Request:
+**POST /api/summarize**: Takes a long text and returns a short summary.
+
+Example Request:
 ```json
 {
   "question": "How long do I have to return a damaged item?"
 }
 ```
 
-**POST /api/summarize** - Summarize long text
+## Future Work
 
-Request:
-```json
-{
-  "text": "Long customer feedback text..."
-}
-```
-
-## Models
-
-The system includes two fine-tuned BERT models:
-- Sentiment Analysis Model
-- Ticket Category Classifier
-
-Models can be downloaded from Hugging Face Hub or trained from scratch using the provided Jupyter notebooks.
-
-## Project Structure
-
-```
-ai-crm-system/
-├── classifier_service/
-│   ├── models/
-│   ├── requirements.txt
-│   └── run.py
-├── rag_service/
-│   ├── rag_docs/
-│   ├── requirements.txt
-│   ├── build_rag_index.py
-│   └── run.py
-└── README.md
-```
-
-## Future Development
-
-- Integration with MongoDB database
-- Complete MERN stack admin dashboard
-- Docker containerization
-- Extended e-commerce platform support
-
-## License
-
-This project is licensed under the MIT License.
+- Integrate with a MongoDB database for ticket storage.
+- Build a full-stack MERN admin dashboard for visualization.
+- Containerize both services using Docker for easy deployment.
