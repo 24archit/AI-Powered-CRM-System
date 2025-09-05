@@ -1,0 +1,4 @@
+venv_CRM_2/
+__pycache__/
+faiss_index/
+.env
