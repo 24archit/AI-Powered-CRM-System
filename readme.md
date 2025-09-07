@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>AI-Powered E-commerce CRM System</title>
-</head>
+
 <body>
 
 <h1>AI-Powered E-commerce CRM System</h1>
@@ -48,7 +46,7 @@
 
 <h3>1. Clone the Repository</h3>
 
-<pre><code>git clone https://github.com/your-username/your-repo-name.git
+<pre><code>git clone https://github.com/24archit/AI-Powered-CRM-System.git
 cd your-repo-name</code></pre>
 
 <h3>2. Set Up Environment Variables</h3>
