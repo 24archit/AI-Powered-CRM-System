@@ -13,10 +13,6 @@
 
 <br>
 
-<p><em><strong>[Placeholder for your Architecture Diagram - a simple diagram showing the two services would be very effective here]</strong></em></p>
-
-<br>
-
 <ol>
 <li><strong>Classifier Service</strong> (<code>Port 8000</code>): A dedicated FastAPI service running a stable TensorFlow environment. It handles all classification tasks.</li>
 <li><strong>RAG Service</strong> (<code>Port 8001</code>): A modern FastAPI service running the latest LangChain and Gemini libraries. It handles all generative AI tasks, including Q&A and summarization.</li>
