@@ -1,4 +1,3 @@
-import google.generativeai as genai
 
 from langchain_community.document_loaders import DirectoryLoader, UnstructuredMarkdownLoader
 from langchain_community.vectorstores import FAISS
@@ -9,12 +8,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from app import config
 
 
-try:
-    genai.configure(api_key=config.GOOGLE_API_KEY)
-    print("✅ Gemini API Key configured successfully.")
-except (TypeError, AttributeError):
-    print("❌ ERROR: Could not find GOOGLE_API_KEY. Please check your config.py and .env file.")
-    exit()
+
 
 
 def build_vector_store():
@@ -47,7 +41,8 @@ def build_vector_store():
         print(f"\n--- Creating embeddings with Gemini ({config.RAG_EMBEDDING_MODEL}) ---")
         embedding_model = GoogleGenerativeAIEmbeddings(
             model=config.RAG_EMBEDDING_MODEL,
-            task_type="RETRIEVAL_DOCUMENT"
+            task_type="RETRIEVAL_DOCUMENT",
+            google_api_key=config.GOOGLE_API_KEY
         )
 
         print("\n--- Building FAISS vector store ---")

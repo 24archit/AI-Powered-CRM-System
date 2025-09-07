@@ -1,0 +1,28 @@
+# --- Stage 1: Base Image ---
+FROM python:3.10-slim
+
+# --- Stage 2: Set up the Environment ---
+WORKDIR /app
+
+
+ENV PYTHONPATH=/app
+
+# --- Stage 3: Install Dependencies ---
+COPY requirements.txt .
+
+# Install any needed packages specified in requirements.txt.
+RUN pip install --no-cache-dir --default-timeout=100 --retries=10 -r requirements.txt
+
+
+COPY ./app ./app
+
+# Copy your trained models from the local 'models' folder into a 'models' subfolder.
+COPY ./models ./models
+
+# --- Stage 5: Expose Port & Run Application ---
+# Make port 8000 available to the world outside this container.
+EXPOSE 8000
+
+# Define the command to run your app using uvicorn.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+

@@ -28,7 +28,7 @@ def create_rag_pipeline():
     )
     retriever = vector_store.as_retriever(search_kwargs={"k": 5})
     
-    llm = ChatGoogleGenerativeAI(model=config.RAG_LLM_MODEL, temperature=0.3)
+    llm = ChatGoogleGenerativeAI(model=config.RAG_LLM_MODEL, temperature=0.3, google_api_key=config.GOOGLE_API_KEY)
     
     prompt = PromptTemplate.from_template("""
 Answer the following question based only on the provided context.
@@ -51,7 +51,7 @@ def create_summarization_chain():
     """
     Creates and returns a LangChain summarization chain.
     """
-    llm = ChatGoogleGenerativeAI(model=config.SUMMARIZE_LLM_MODEL, temperature=0.2)
+    llm = ChatGoogleGenerativeAI(model=config.SUMMARIZE_LLM_MODEL, temperature=0.2, google_api_key=config.GOOGLE_API_KEY)
     chain = load_summarize_chain(llm, chain_type="stuff")
     print("✅ Summarization Chain created successfully.")
     return chain

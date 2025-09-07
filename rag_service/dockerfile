@@ -1,0 +1,31 @@
+# --- Stage 1: Base Image ---
+FROM python:3.10-slim
+
+# --- Stage 2: Set up the Environment ---
+WORKDIR /app
+
+# --- Stage 3: Install Dependencies ---
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# --- Stage 4: Copy Application Code & Knowledge Base ---
+# Copy the application code from your local 'app' folder into a subfolder inside the container.
+COPY ./app ./app
+
+# Copy the main entrypoint file into the container's working directory.
+COPY main.py .
+
+# Copy the pre-built FAISS index.
+COPY ./faiss_index ./faiss_index
+
+# Copy the environment file.
+COPY .env .
+
+# --- Stage 5: Expose Port & Run Application ---
+# Make port 8001 available to the world outside this container.
+EXPOSE 8001
+
+# Define the command to run your app using uvicorn.
+# It will run 'main.py' from the '/app' WORKDIR, which can then import from the './app' subfolder.
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+

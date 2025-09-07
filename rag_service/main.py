@@ -2,45 +2,65 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.api.router import router as api_router, ml_models
 from app.services import create_rag_pipeline, create_summarization_chain
+import logging
+import os
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+# Load version from environment or fallback
+APP_VERSION = os.getenv("APP_VERSION", "1.0.0")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Manages the application's startup and shutdown events.
-    On startup, it loads all necessary AI models and chains.
-    On shutdown, it clears them from memory.
+    Manage startup and shutdown events for the FastAPI application.
+    On startup: load all AI models and chains into memory.
+    On shutdown: release models from memory.
     """
-    # This code runs on startup
-    print("--- Loading AI Models for RAG Service ---")
-    retriever, document_chain = create_rag_pipeline()
-    ml_models["retriever"] = retriever
-    ml_models["document_chain"] = document_chain
-    
-    summarization_chain = create_summarization_chain()
-    ml_models["summarization_chain"] = summarization_chain
-    print("--- Model loading complete. API is ready. ---")
-    
-    yield
-    
-    # This code runs on shutdown
-    ml_models.clear()
-    print("--- Models cleared from memory ---")
+    try:
+        logger.info("🚀 Starting AI CRM RAG & Summarization Service (v%s)", APP_VERSION)
 
-# Create the main FastAPI application instance
+        # Load RAG pipeline
+        retriever, document_chain = create_rag_pipeline()
+        ml_models["retriever"] = retriever
+        ml_models["document_chain"] = document_chain
+
+        # Load summarization chain
+        ml_models["summarization_chain"] = create_summarization_chain()
+
+        logger.info("✅ Model loading complete. API is ready.")
+    except Exception as e:
+        logger.exception("❌ Failed to load AI models: %s", e)
+        raise
+
+    yield  # Application runs here
+
+    # On shutdown
+    ml_models.clear()
+    logger.info("🧹 Models cleared from memory. Shutdown complete.")
+
+# Create the FastAPI application instance
 app = FastAPI(
     title="AI CRM RAG & Summarization Service",
     description="Provides question-answering and text summarization capabilities.",
-    version="1.0.0",
+    version=APP_VERSION,
     lifespan=lifespan
 )
 
-# API endpoints defined in the router.py file
+# Include API routers
 app.include_router(api_router, prefix="/api")
 
 @app.get("/", tags=["Health Check"])
 def read_root():
     """
-    Root endpoint for a basic health check.
+    Root health check endpoint.
     """
-    return {"status": "RAG & Summarization Service is running."}
-
+    return {
+        "status": "RAG & Summarization Service is running",
+        "version": APP_VERSION
+    }
