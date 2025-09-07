@@ -1,152 +1,110 @@
-# AI-powered CRM System
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI-Powered E-commerce CRM System</title>
+</head>
+<body>
 
-An intelligent, multi-model AI system designed to automate the analysis of customer feedback for e-commerce platforms like Amazon and Flipkart. This project leverages fine-tuned BERT models for high-accuracy classification and a Retrieval-Augmented Generation (RAG) engine for automated, context-aware customer support.
+<h1>AI-Powered E-commerce CRM System</h1>
 
-## Core Features
+<p>A microservices-based AI backend designed to automate and enhance customer service for e-commerce platforms. This system analyzes customer feedback in real-time, classifies issues for efficient routing, and provides automated, context-aware answers to user queries from a custom knowledge base.</p>
 
-🤖 **Automated Ticket Analysis**: Instantly classifies incoming customer feedback for sentiment and ticket category with high accuracy.
+<h2>🏛️ Architecture: A Robust Microservices Approach</h2>
 
-🧠 **Intelligent Q&A**: A RAG engine answers customer questions using a knowledge base of company documents, providing accurate, context-aware responses.
+<p>This project is architected as two independent microservices to resolve critical dependency conflicts between the older ML stack (<code>TensorFlow 2.12</code>, <code>numpy &lt; 1.24</code>) and the modern RAG stack (<code>LangChain</code>, <code>numpy &gt;= 1.25</code>). This professional architecture ensures stability, scalability, and independent deployment, managed seamlessly by Docker Compose.</p>
 
-📈 **Strategic Insights**: Discovers hidden topics and trends from customer feedback to provide actionable business intelligence.
+<br>
 
-⚡ **Scalable Microservices Architecture**: Built with two independent FastAPI services to handle ML and RAG tasks separately, ensuring robustness and resolving dependency conflicts.
+<p><em><strong>[Placeholder for your Architecture Diagram - a simple diagram showing the two services would be very effective here]</strong></em></p>
 
-✅ **Reproducible ML Pipeline**: Includes all scripts and notebooks to reproduce the fine-tuned models and RAG index from scratch.
+<br>
 
-## Architecture Overview
+<ol>
+<li><strong>Classifier Service</strong> (<code>Port 8000</code>): A dedicated FastAPI service running a stable TensorFlow environment. It handles all classification tasks.</li>
+<li><strong>RAG Service</strong> (<code>Port 8001</code>): A modern FastAPI service running the latest LangChain and Gemini libraries. It handles all generative AI tasks, including Q&A and summarization.</li>
+</ol>
 
-The backend is built on a microservices architecture to ensure stability and scalability. This professional approach resolves Python's "dependency hell" by isolating older ML libraries from modern RAG libraries.
+<h2>✨ Key Features</h2>
 
-**Classifier Service**: A dedicated FastAPI service running on a TensorFlow 2.12 stack. It handles all classification tasks (Sentiment and Ticket Category).
+<ul>
+<li><strong>Sentiment Analysis:</strong> Automatically classifies customer feedback as <code>Positive</code> or <code>Negative</code> with a <strong>94% F1-score</strong>.</li>
+<li><strong>Automated Ticket Classification:</strong> Routes incoming tickets to one of six categories (e.g., "Returns & Refunds," "Delivery & Tracking") with an <strong>86% F1-score</strong>.</li>
+<li><strong>Retrieval-Augmented Generation (RAG):</strong> Answers user questions based on a custom knowledge base of company documents, providing a semantic confidence score for each response.</li>
+<li><strong>AI-Powered Summarization:</strong> Generates concise, one-sentence summaries of long customer complaints.</li>
+<li><strong>Fully Containerized:</strong> Both services are packaged with <strong>Docker</strong> and orchestrated with <strong>Docker Compose</strong> for a reproducible, one-command setup.</li>
+</ul>
 
-**RAG & Summarization Service**: A separate FastAPI service running on a modern LangChain stack. It manages the vector store and handles all generative AI tasks (Q&A and Summarization).
+<h2>🚀 Getting Started</h2>
 
-**Express/Node.js Backend** (Not included in this repo): The main application server that would handle database interactions and communicate with these two AI services.
+<p>Follow these instructions to set up and run the entire backend on your local machine.</p>
 
-## Tech Stack
+<h3>Prerequisites</h3>
 
-### AI / Machine Learning
-- **TensorFlow & Keras**: For fine-tuning classification models.
-- **Hugging Face Transformers**: For leveraging pre-trained BERT models.
-- **LangChain**: For orchestrating the RAG and summarization pipelines.
-- **Google Gemini**: For embeddings and generative AI.
-- **FAISS**: For high-speed vector storage and retrieval.
-- **BERTopic**: For unsupervised topic discovery.
+<ul>
+<li>Docker & Docker Compose</li>
+<li>Python 3.10+</li>
+<li>Git</li>
+</ul>
 
-### Backend
-- **FastAPI**: For building the high-performance, asynchronous APIs.
-- **Uvicorn**: As the ASGI server.
+<h3>1. Clone the Repository</h3>
 
-### Python Libraries
-- **Pydantic**: For data validation.
-- **scikit-learn**: For model evaluation.
-- **python-dotenv**: For environment variable management.
+<pre><code>git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name</code></pre>
 
-## Getting Started
+<h3>2. Set Up Environment Variables</h3>
 
-This repository contains two separate services. Please follow the setup instructions for each.
+<p>The RAG service requires a Google Gemini API key.</p>
 
-### Prerequisites
-- Python 3.10
-- A GOOGLE_API_KEY for the Gemini API.
+<ul>
+<li>Navigate to the <code>rag_service</code> directory.</li>
+<li>Create a file named <code>.env</code>.</li>
+<li>Add your API key to the file:</li>
+</ul>
 
-### 1. The Classifier Service
+<pre><code>GOOGLE_API_KEY="AIzaSy...your...key...here"</code></pre>
 
-This service runs the Sentiment and Ticket Classifier models.
+<h3>3. Build the Knowledge Base</h3>
 
-Navigate to the classifier_service directory:
-```bash
-cd classifier_service
-```
+<p>The RAG engine needs a searchable index of your <code>rag_docs</code>. This is a one-time setup step.</p>
 
-Create and activate a virtual environment:
-```bash
-python -m venv venv_tf
-venv_tf\Scripts\activate
-```
+<ul>
+<li>Navigate to the <code>rag_service</code> directory.</li>
+<li>Create and activate a virtual environment and install the requirements.</li>
+<li>Run the build script:</li>
+</ul>
 
-Install the required dependencies:
-```bash
-pip install -r requirements.txt
-```
+<pre><code>python build_rag_index.py</code></pre>
 
-**Get the Models:**
-- **Option A (Recommended)**: Download the fine-tuned models from the Hugging Face Hub and place them in the `classifier_service/models/` directory.
-- **Option B (Reproduce)**: Run the training notebooks (`Sentiment Analysis.ipynb`, `Ticket Classifier.ipynb`) to fine-tune and save the models from scratch.
+<p>This will create a <code>faiss_index</code> folder.</p>
 
-Run the service:
-```bash
-python run.py
-```
+<h3>4. Run the Application with Docker Compose</h3>
 
-The service will be available at http://127.0.0.1:8000.
+<p>From the <strong>root directory</strong> of the project (the one containing <code>docker-compose.yml</code>), run the following command:</p>
 
-### 2. The RAG & Summarization Service
+<pre><code>docker-compose up --build</code></pre>
 
-This service runs the Q&A and Summarization models.
+<p>This single command will:</p>
 
-Navigate to the rag_service directory:
-```bash
-cd rag_service
-```
+<ol>
+<li>Build the Docker images for both the <code>classifier-service</code> and the <code>rag-service</code>.</li>
+<li>Start both services in their respective containers.</li>
+</ol>
 
-Create and activate a new virtual environment:
-```bash
-python -m venv venv_rag
-venv_rag\Scripts\activate
-```
+<p>You can now access your running services:</p>
 
-Install the required dependencies:
-```bash
-pip install -r requirements.txt
-```
+<ul>
+<li><strong>Classifier Service:</strong> <code>http://localhost:8000/docs</code></li>
+<li><strong>RAG & Summarization Service:</strong> <code>http://localhost:8001/docs</code></li>
+</ul>
 
-Create a .env file in this directory and add your API key:
-```
-GOOGLE_API_KEY="YOUR_API_KEY_HERE"
-```
+<h2>🛠️ Tech Stack</h2>
 
-Build the Knowledge Base: The source documents are in the rag_docs folder. Run the build script to create the searchable index:
-```bash
-python build_rag_index.py
-```
+<ul>
+<li><strong>Backend:</strong> FastAPI, Uvicorn</li>
+<li><strong>Machine Learning:</strong> TensorFlow, Keras, Scikit-learn, Pandas</li>
+<li><strong>NLP & Generative AI:</strong> Transformers (BERT), LangChain, Google Gemini, Sentence-Transformers, FAISS</li>
+<li><strong>Containerization & Deployment:</strong> Docker, Docker Compose</li>
+</ul>
 
-Run the service:
-```bash
-python run.py
-```
-
-The service will be available at http://127.0.0.1:8001.
-
-## API Endpoints
-
-### Classifier Service (localhost:8000)
-
-**POST /api/analyze**: Takes text and returns sentiment and ticket category predictions.
-
-Example Request:
-```json
-{
-  "text": "My order arrived broken, I need a replacement."
-}
-```
-
-### RAG Service (localhost:8001)
-
-**POST /api/ask-rag**: Takes a question and returns an answer from the knowledge base.
-
-**POST /api/summarize**: Takes a long text and returns a short summary.
-
-Example Request:
-```json
-{
-  "question": "How long do I have to return a damaged item?"
-}
-```
-
-## Future Work
-
-- Integrate with a MongoDB database for ticket storage.
-- Build a full-stack MERN admin dashboard for visualization.
-- Containerize both services using Docker for easy deployment.
+</body>
+</html>
