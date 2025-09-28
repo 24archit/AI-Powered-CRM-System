@@ -11,7 +11,7 @@ print("✅ Gemini API Key configured successfully.")
 
 RAG_INDEX_PATH = "./faiss_index"
 RAG_DOCS_PATH = "./rag_docs"    
-RAG_EMBEDDING_MODEL = "models/embedding-001"
+RAG_EMBEDDING_MODEL = "gemini-embedding-001"
 RAG_LLM_MODEL = "gemini-2.0-flash"
 CHUNK_SIZE=1000
 CHUNK_OVERLAP=100
