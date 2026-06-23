@@ -20,7 +20,6 @@ This project has been refactored into a single monolithic API mimicking the GoNi
 - `data/knowledge_base/`: Contains the raw source documents (markdown, text) for the RAG ingestion pipeline.
 - `schemas.py`: Pydantic validation schemas.
 - `main.py`: FastAPI entrypoint.
-- `modal_app.py`: Modal deployment script.
 
 ## Setup
 
