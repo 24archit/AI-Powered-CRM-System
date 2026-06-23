@@ -174,3 +174,4 @@ cython_debug/
 # Hugging Face Spaces temporary folder
 hf-space/
 server/models
+node_modules
