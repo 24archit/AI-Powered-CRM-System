@@ -2,7 +2,7 @@ import uuid
 from typing import List, Dict
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, CrossEncoder
 from core import config
 
 class CRMVectorStore:
@@ -24,8 +24,11 @@ class CRMVectorStore:
         print(f"Loading local embedding model: {config.RAG_EMBEDDING_MODEL}")
         self.encoder = SentenceTransformer(config.RAG_EMBEDDING_MODEL)
         
+        print(f"Loading local reranker model: {config.RAG_RERANKER_MODEL}")
+        self.reranker = CrossEncoder(config.RAG_RERANKER_MODEL)
+        
         # bge-base-en-v1.5 has 768 dimensions
-        self.vector_size = self.encoder.get_sentence_embedding_dimension()
+        self.vector_size = self.encoder.get_embedding_dimension()
         
         self._init_collection()
 
@@ -73,19 +76,35 @@ class CRMVectorStore:
         print(f"Successfully upserted {len(points)} chunks into Qdrant.")
 
     def search(self, query: str, top_k: int = 5) -> List[Dict]:
-        """Searches Qdrant for the top k most similar chunks."""
+        """Searches Qdrant for the top k most similar chunks and reranks them."""
         query_vector = self.encoder.encode(query).tolist()
         
+        retrieve_k = getattr(config, 'RAG_RETRIEVE_K', 15)
+        
+        # Stage 1: Dense Retrieval
         hits = self.client.search(
             collection_name=self.collection_name,
             query_vector=query_vector,
-            limit=top_k
+            limit=retrieve_k
         )
         
+        if not hits:
+            return []
+            
+        # Stage 2: Cross-Encoder Reranking
+        documents = [hit.payload["text"] for hit in hits]
+        sentence_pairs = [[query, doc] for doc in documents]
+        
+        scores = self.reranker.predict(sentence_pairs)
+        
         results = []
-        for hit in hits:
+        for i, hit in enumerate(hits):
             results.append({
-                "score": hit.score,
+                "score": float(scores[i]),
                 "payload": hit.payload
             })
-        return results
+            
+        # Sort by reranker score descending
+        results = sorted(results, key=lambda x: x["score"], reverse=True)
+        
+        return results[:top_k]

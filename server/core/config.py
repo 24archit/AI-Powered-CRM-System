@@ -25,6 +25,8 @@ QDRANT_COLLECTION_NAME = "crm_rag_docs"
 RAG_DOCS_PATH = os.path.join(BASE_DIR, "data", "knowledge_base")
 
 RAG_EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
+RAG_RERANKER_MODEL = "BAAI/bge-reranker-base"
 RAG_LLM_MODEL = "meta-llama/Meta-Llama-3-8B-Instruct"
+RAG_RETRIEVE_K = 15
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 100
