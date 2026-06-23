@@ -13,16 +13,14 @@ def load_rag_models():
         return
 
     if not config.QDRANT_URL or not config.QDRANT_API_KEY:
-        print("⚠️ QDRANT_URL or QDRANT_API_KEY not set. RAG models will not be loaded.")
-        return
-
-    try:
-        store = CRMVectorStore()
-        ml_models["vector_store"] = store
-        print("✅ Qdrant vector store loaded.")
-    except Exception as e:
-        print(f"❌ Failed to initialize Qdrant vector store: {e}")
-        return
+        print("⚠️ QDRANT_URL or QDRANT_API_KEY not set. Qdrant will not be loaded.")
+    else:
+        try:
+            store = CRMVectorStore()
+            ml_models["vector_store"] = store
+            print("✅ Qdrant vector store loaded.")
+        except Exception as e:
+            print(f"❌ Failed to initialize Qdrant vector store: {e}")
     
     # Initialize the Serverless Inference API client
     try:
