@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from core.logging_config import logger
-from engine.classifier_engine import load_classifier_models
+
 from engine.rag_engine import load_rag_models
 from api.router import router
 
@@ -13,9 +13,7 @@ APP_VERSION = os.getenv("APP_VERSION", "1.0.0")
 async def lifespan(app: FastAPI):
     logger.info("Loading models and initializing AI Engine...")
     
-    # Load Classifier Models
-    load_classifier_models()
-    
+
     # Load RAG Models
     load_rag_models()
 

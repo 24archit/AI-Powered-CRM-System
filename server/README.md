@@ -16,7 +16,7 @@ This project has been refactored into a single monolithic API mimicking the GoNi
 - `core/`: Configurations, globals, logging.
 - `engine/`: Model loading, inference, and RAG execution logic.
 - `services/`: Business logic.
-- `models/`: Contains the sentiment model and ticket classification model.
+
 - `data/knowledge_base/`: Contains the raw source documents (markdown, text) for the RAG ingestion pipeline.
 - `schemas.py`: Pydantic validation schemas.
 - `main.py`: FastAPI entrypoint.

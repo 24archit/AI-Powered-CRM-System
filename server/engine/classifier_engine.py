@@ -3,12 +3,7 @@ from huggingface_hub import AsyncInferenceClient
 from core import config
 from core.globals import ml_models
 
-def load_classifier_models():
-    """
-    Since we shifted to the Llama-3 API, there are no local classification models to load.
-    The HF Inference Client is initialized inside rag_engine.py.
-    """
-    pass
+
 
 async def predict_sentiment(text: str):
     client: AsyncInferenceClient = ml_models.get("llm_client")
