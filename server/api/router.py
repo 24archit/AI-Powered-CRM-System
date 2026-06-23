@@ -19,22 +19,22 @@ def health_check():
 @router.post("/analyze", response_model=AnalysisResponse, tags=["Classifier"])
 async def analyze_feedback(request: FeedbackRequest):
     try:
-        return analyze_text(request.text)
+        return await analyze_text(request.text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 # --- RAG Routes ---
 @router.post("/ask-rag", response_model=RAGResponse, tags=["RAG"])
 async def ask_rag_endpoint(request: RAGRequest):
-    if "retriever" not in ml_models or "document_chain" not in ml_models:
-        raise HTTPException(status_code=503, detail="RAG service is not available. Please check if FAISS index is loaded.")
+    if "vector_store" not in ml_models or "llm_client" not in ml_models:
+        raise HTTPException(status_code=503, detail="RAG service is not available. Please check if Qdrant is loaded.")
     
     response = await get_rag_response(request.question)
     return response
 
 @router.post("/summarize", response_model=SummarizeResponse, tags=["Summarization"])
 async def summarize_endpoint(request: SummarizeRequest):
-    if "summarization_chain" not in ml_models:
+    if "llm_client" not in ml_models:
         raise HTTPException(status_code=503, detail="Summarization service is not available.")
         
     response = await get_summary_response(request.text)

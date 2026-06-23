@@ -1,45 +1,56 @@
-import numpy as np
-import tensorflow as tf
-from core.globals import ml_models
+import json
+from huggingface_hub import AsyncInferenceClient
 from core import config
-from transformers import BertTokenizer, TFBertForSequenceClassification
+from core.globals import ml_models
 
 def load_classifier_models():
     """
-    Loads all AI classifier models.
+    Since we shifted to the Llama-3 API, there are no local classification models to load.
+    The HF Inference Client is initialized inside rag_engine.py.
     """
+    pass
+
+async def predict_sentiment(text: str):
+    client: AsyncInferenceClient = ml_models.get("llm_client")
+    if not client:
+        raise RuntimeError("LLM Client not loaded.")
+        
+    system_prompt = f"You are a strict classifier. Classify the user's text into one of these sentiments: {config.SENTIMENT_CLASSES}. Return ONLY a JSON object with 'prediction' (string) and 'confidence' (float between 0.0 and 1.0). Do not include any other text."
+    user_prompt = text
+    
     try:
-        ml_models["sentiment_model"] = TFBertForSequenceClassification.from_pretrained(config.SENTIMENT_MODEL_PATH)
-        ml_models["sentiment_tokenizer"] = BertTokenizer.from_pretrained(config.SENTIMENT_MODEL_PATH)
-        print("✅ Sentiment model loaded")
+        response = await client.chat_completion(
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
+            max_tokens=50, temperature=0.1
+        )
+        content = response.choices[0].message.content.strip()
+        # Clean potential markdown wrapping
+        if content.startswith("```json"): content = content[7:]
+        if content.endswith("```"): content = content[:-3]
+        data = json.loads(content)
+        return data.get("prediction", "Neutral"), float(data.get("confidence", 0.0))
     except Exception as e:
-        print(f"❌ Sentiment model load failed: {e}")
+        print(f"Sentiment classification failed: {e}")
+        return "Neutral", 0.0
 
+async def predict_ticket(text: str):
+    client: AsyncInferenceClient = ml_models.get("llm_client")
+    if not client:
+        raise RuntimeError("LLM Client not loaded.")
+        
+    system_prompt = f"You are a strict classifier. Classify the user's text into one of these ticket categories: {config.TICKET_CLASSES}. Return ONLY a JSON object with 'prediction' (string) and 'confidence' (float between 0.0 and 1.0). Do not include any other text."
+    user_prompt = text
+    
     try:
-        ml_models["ticket_model"] = TFBertForSequenceClassification.from_pretrained(config.TICKET_MODEL_PATH)
-        ml_models["ticket_tokenizer"] = BertTokenizer.from_pretrained("bert-base-uncased")
-        print("✅ Ticket model loaded")
+        response = await client.chat_completion(
+            messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}],
+            max_tokens=50, temperature=0.1
+        )
+        content = response.choices[0].message.content.strip()
+        if content.startswith("```json"): content = content[7:]
+        if content.endswith("```"): content = content[:-3]
+        data = json.loads(content)
+        return data.get("prediction", "General Inquiry"), float(data.get("confidence", 0.0))
     except Exception as e:
-        print(f"❌ Ticket model load failed: {e}")
-
-def predict_sentiment(text: str):
-    model = ml_models.get("sentiment_model")
-    tokenizer = ml_models.get("sentiment_tokenizer")
-    if not model or not tokenizer:
-        raise RuntimeError("Sentiment model not loaded.")
-    inputs = tokenizer(text, return_tensors="tf", truncation=True, padding=True, max_length=128)
-    logits = model(inputs).logits
-    probs = tf.nn.softmax(logits, axis=1).numpy()[0]
-    idx = np.argmax(probs)
-    return config.SENTIMENT_CLASSES[idx], float(probs[idx])
-
-def predict_ticket(text: str):
-    model = ml_models.get("ticket_model")
-    tokenizer = ml_models.get("ticket_tokenizer")
-    if not model or not tokenizer:
-        raise RuntimeError("Ticket model not loaded.")
-    inputs = tokenizer(text, return_tensors="tf", truncation=True, padding=True, max_length=128)
-    logits = model(inputs).logits
-    probs = tf.nn.softmax(logits, axis=1).numpy()[0]
-    idx = np.argmax(probs)
-    return config.TICKET_CLASSES[idx], float(probs[idx])
+        print(f"Ticket classification failed: {e}")
+        return "General Inquiry", 0.0

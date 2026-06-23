@@ -6,8 +6,6 @@ load_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # --- Classifier Config ---
-SENTIMENT_MODEL_PATH = os.path.join(BASE_DIR, "models", "sentiment_model", "bert_sentiment_model")
-TICKET_MODEL_PATH = os.path.join(BASE_DIR, "models", "ticket_model", "bert_ticket_classifier_model")
 
 SENTIMENT_CLASSES = ['Negative', 'Positive']
 TICKET_CLASSES = [
