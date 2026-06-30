@@ -1,0 +1,609 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --crm-bg: #0f1117;
+  --crm-surface: #1a1d27;
+  --crm-surface-2: #1e2130;
+  --crm-border: rgba(255, 255, 255, 0.06);
+  --crm-border-strong: rgba(255, 255, 255, 0.12);
+  --crm-primary: #6366f1;
+  --crm-primary-glow: rgba(99, 102, 241, 0.25);
+  --crm-emerald: #10b981;
+  --crm-red: #ef4444;
+  --crm-amber: #f59e0b;
+  --crm-text: #f1f5f9;
+  --crm-text-muted: #94a3b8;
+  --crm-sidebar-width: 260px;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--crm-bg);
+  color: var(--crm-text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  text-align: left;
+  border: none;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Scrollbars ===== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* ===== CRM Layout ===== */
+.crm-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--crm-bg);
+}
+
+/* ===== Sidebar ===== */
+.crm-sidebar {
+  width: var(--crm-sidebar-width);
+  min-height: 100vh;
+  background: var(--crm-surface);
+  border-right: 1px solid var(--crm-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  padding: 0;
+  overflow-y: auto;
+}
+
+.crm-sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--crm-border);
+}
+
+.crm-sidebar-logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  flex-shrink: 0;
+}
+
+.crm-sidebar-logo-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--crm-text);
+  letter-spacing: -0.01em;
+}
+
+.crm-sidebar-logo-sub {
+  font-size: 11px;
+  color: var(--crm-text-muted);
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+.crm-nav-section {
+  padding: 20px 12px 8px;
+}
+
+.crm-nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--crm-text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+
+.crm-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--crm-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: 2px;
+  border: 1px solid transparent;
+}
+
+.crm-nav-item:hover {
+  background: rgba(255,255,255,0.04);
+  color: var(--crm-text);
+}
+
+.crm-nav-item.active {
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.crm-nav-item .nav-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.crm-nav-badge {
+  margin-left: auto;
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.crm-sidebar-footer {
+  margin-top: auto;
+  padding: 16px 12px;
+  border-top: 1px solid var(--crm-border);
+}
+
+.crm-user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--crm-border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.crm-user-card:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.crm-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.crm-user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--crm-text);
+}
+
+.crm-user-role {
+  font-size: 11px;
+  color: var(--crm-text-muted);
+}
+
+/* ===== Main Content ===== */
+.crm-main {
+  margin-left: var(--crm-sidebar-width);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ===== Top Bar ===== */
+.crm-topbar {
+  height: 64px;
+  background: rgba(26, 29, 39, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--crm-border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  gap: 16px;
+}
+
+.crm-topbar-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--crm-text);
+  flex: 1;
+}
+
+.crm-topbar-subtitle {
+  font-size: 13px;
+  color: var(--crm-text-muted);
+  font-weight: 400;
+}
+
+/* ===== Page Content ===== */
+.crm-content {
+  padding: 28px 28px;
+  flex: 1;
+}
+
+/* ===== KPI Cards ===== */
+.crm-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.crm-kpi-card {
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border);
+  border-radius: 16px;
+  padding: 22px 22px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s;
+}
+
+.crm-kpi-card:hover {
+  border-color: var(--crm-border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+}
+
+.crm-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 16px 16px 0 0;
+}
+
+.crm-kpi-card.primary::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+.crm-kpi-card.danger::before { background: linear-gradient(90deg, #ef4444, #f97316); }
+.crm-kpi-card.warning::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.crm-kpi-card.success::before { background: linear-gradient(90deg, #10b981, #34d399); }
+
+.crm-kpi-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--crm-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 10px;
+}
+
+.crm-kpi-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--crm-text);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.crm-kpi-change {
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.crm-kpi-icon {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* ===== Section Cards ===== */
+.crm-card {
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.crm-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--crm-border);
+}
+
+.crm-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--crm-text);
+}
+
+.crm-card-subtitle {
+  font-size: 12px;
+  color: var(--crm-text-muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.crm-card-body {
+  padding: 22px;
+}
+
+/* ===== Charts Grid ===== */
+.crm-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+/* ===== Status Badges ===== */
+.crm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.crm-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.crm-badge.open { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.crm-badge.open .crm-badge-dot { background: #fbbf24; }
+.crm-badge.resolved { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.crm-badge.resolved .crm-badge-dot { background: #34d399; }
+.crm-badge.fraud { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.crm-badge.fraud .crm-badge-dot { background: #ef4444; }
+.crm-badge.duplicate { background: rgba(245, 158, 11, 0.12); color: #fbbf24; }
+.crm-badge.positive { background: rgba(16, 185, 129, 0.12); color: #34d399; }
+.crm-badge.negative { background: rgba(239, 68, 68, 0.12); color: #f87171; }
+.crm-badge.neutral { background: rgba(148, 163, 184, 0.12); color: #94a3b8; }
+.crm-badge.pending { background: rgba(99, 102, 241, 0.12); color: #818cf8; }
+
+/* ===== Data Table ===== */
+.crm-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.crm-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--crm-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--crm-border);
+}
+
+.crm-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  vertical-align: middle;
+}
+
+.crm-table tr:last-child td { border-bottom: none; }
+.crm-table tr:hover td { background: rgba(255,255,255,0.02); }
+.crm-table tr.fraud-row td { background: rgba(239, 68, 68, 0.04); }
+.crm-table tr.duplicate-row td { background: rgba(245, 158, 11, 0.04); }
+
+/* ===== Ticket Cards ===== */
+.crm-ticket-card {
+  background: var(--crm-surface);
+  border: 1px solid var(--crm-border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 14px;
+  transition: all 0.25s;
+  cursor: pointer;
+}
+
+.crm-ticket-card:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  transform: translateY(-1px);
+}
+
+.crm-ticket-card.fraud {
+  border-left: 3px solid #ef4444;
+}
+
+/* ===== AI Response Panel ===== */
+.crm-ai-panel {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 14px;
+}
+
+.crm-ai-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #818cf8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.crm-ai-label-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6366f1;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.7); }
+}
+
+/* ===== Login Page ===== */
+.crm-login-page {
+  min-height: 100vh;
+  display: flex;
+  background: var(--crm-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.crm-login-bg-blobs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.crm-login-bg-blobs::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  top: -100px;
+  left: -100px;
+}
+
+.crm-login-bg-blobs::after {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+  bottom: -80px;
+  right: 30%;
+}
+
+.crm-login-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  position: relative;
+  z-index: 1;
+}
+
+.crm-login-right {
+  width: 480px;
+  min-height: 100vh;
+  background: var(--crm-surface);
+  border-left: 1px solid var(--crm-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 48px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+/* ===== Progress Bar ===== */
+.crm-progress-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+.crm-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.8s ease;
+}
+
+/* ===== Misc Utilities ===== */
+.text-muted { color: var(--crm-text-muted) !important; }
+.text-primary { color: var(--crm-primary) !important; }
+.font-mono { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .crm-sidebar { display: none; }
+  .crm-main { margin-left: 0; }
+  .crm-charts-grid { grid-template-columns: 1fr; }
+  .crm-login-left { display: none; }
+  .crm-login-right { width: 100%; }
+  .crm-content { padding: 16px; }
+}

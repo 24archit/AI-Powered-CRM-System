@@ -82,11 +82,12 @@ class CRMVectorStore:
         retrieve_k = getattr(config, 'RAG_RETRIEVE_K', 15)
         
         # Stage 1: Dense Retrieval
-        hits = self.client.search(
+        response = self.client.query_points(
             collection_name=self.collection_name,
-            query_vector=query_vector,
+            query=query_vector,
             limit=retrieve_k
         )
+        hits = response.points
         
         if not hits:
             return []

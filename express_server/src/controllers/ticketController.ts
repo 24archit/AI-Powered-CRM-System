@@ -1,56 +1,91 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import mongoose from 'mongoose';
 import axios from 'axios';
 import Ticket from '../models/Ticket';
-import Customer from '../models/Customer';
+import User from '../models/User';
+import { AuthRequest } from '../middlewares/authMiddleware';
 
-const DL_SERVER_URL = process.env.DL_SERVER_URL || 'http://localhost:8000';
+const DL_SERVER_URL = process.env.DL_SERVER_URL || 'http://localhost:8000/api';
 
-export const createTicket = async (req: Request, res: Response): Promise<void> => {
+export const createTicket = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { customerId, subject, description } = req.body;
+        const { subject, description } = req.body;
+        const userId = req.user?.userId;
 
-        // Verify customer exists
-        const customer = await Customer.findById(customerId);
-        if (!customer) {
-            res.status(404).json({ message: 'Customer not found' });
+        const user = await User.findById(userId);
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
             return;
         }
 
-        // 1. Call AI DL-Server for Classification (Sentiment & Ticket)
+        // AI Pipeline Variables
         let aiSentiment = 'Neutral';
         let aiSentimentConf = 0;
         let aiCategory = 'General Inquiry';
         let aiCategoryConf = 0;
+        let aiSuggestedResponse = '';
+        let aiProcessed = false;
+        let fraudRisk = 0.0;
+        let isDuplicate = false;
+        let duplicateMaxSimilarity = 0.0;
+        
+        const { uploaded_image_b64, product_image_b64 } = req.body;
 
         try {
-            const analyzeRes = await axios.post(`${DL_SERVER_URL}/analyze`, {
-                text: description
-            });
+            // Step 1: Multilingual Translation (to English)
+            const transRes = await axios.post(`${DL_SERVER_URL}/translate`, { text: description });
+            const englishText = transRes.data.translated_text || description;
+
+            // Step 2: Vision Fraud Detection
+            if (uploaded_image_b64 && product_image_b64) {
+                const visionRes = await axios.post(`${DL_SERVER_URL}/vision-fraud`, { 
+                    uploaded_image_b64, 
+                    product_image_b64 
+                });
+                fraudRisk = visionRes.data.fraud_risk;
+            }
+
+            // Step 3: Core NLP Analysis (Sentiment & Category)
+            const analyzeRes = await axios.post(`${DL_SERVER_URL}/analyze`, { text: englishText });
             aiSentiment = analyzeRes.data.sentiment.prediction;
             aiSentimentConf = analyzeRes.data.sentiment.confidence;
             aiCategory = analyzeRes.data.ticket_category.prediction;
             aiCategoryConf = analyzeRes.data.ticket_category.confidence;
-        } catch (error) {
-            console.error('DL Server Classification failed, falling back to defaults');
-        }
 
-        // 2. Call AI DL-Server for RAG Auto-Response Draft
-        let aiSuggestedResponse = '';
-        try {
-            const ragRes = await axios.post(`${DL_SERVER_URL}/ask-rag`, {
-                question: description
-            });
+            // Step 4: Knowledge Retrieval (RAG)
+            const ragRes = await axios.post(`${DL_SERVER_URL}/ask-rag`, { question: englishText });
             aiSuggestedResponse = ragRes.data.answer;
+            
+            // Step 5: Duplicate Detection
+            // Fetch recent open tickets to compare
+            const recentOpenTickets = await Ticket.find({ status: 'Open' }).limit(50);
+            const openTicketsTexts = recentOpenTickets.map(t => t.description);
+            
+            if (openTicketsTexts.length > 0) {
+                const dupRes = await axios.post(`${DL_SERVER_URL}/duplicate-check`, { 
+                    current_text: englishText, 
+                    open_tickets_texts: openTicketsTexts 
+                });
+                isDuplicate = dupRes.data.is_duplicate;
+                duplicateMaxSimilarity = dupRes.data.max_similarity;
+            }
+
+            // Step 6: Native Language Output
+            
+            aiProcessed = true;
         } catch (error) {
-            console.error('DL Server RAG failed');
+            console.error('DL Server processing failed. Ticket will be queued for fallback polling.');
         }
 
-        // 3. Save to MongoDB
         const newTicket = new Ticket({
-            customer: customer._id,
+            user: userId,
             subject,
             description,
             status: 'Open',
+            aiProcessed,
+            fraudRisk,
+            isDuplicate,
+            duplicateMaxSimilarity,
             aiSentiment,
             aiSentimentConfidence: aiSentimentConf,
             aiCategory,
@@ -61,7 +96,7 @@ export const createTicket = async (req: Request, res: Response): Promise<void> =
         await newTicket.save();
 
         res.status(201).json({
-            message: 'Ticket created and AI-triaged successfully',
+            message: 'Ticket created successfully',
             ticket: newTicket
         });
 
@@ -70,9 +105,23 @@ export const createTicket = async (req: Request, res: Response): Promise<void> =
     }
 };
 
-export const getTickets = async (req: Request, res: Response): Promise<void> => {
+export const getTickets = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const tickets = await Ticket.find().populate('customer', 'name email');
+        const userId = req.user?.userId;
+        if (!userId) {
+            res.status(401).json({ message: 'Unauthorized' });
+            return;
+        }
+        
+        const role = req.user?.role;
+
+        let tickets;
+        if (role === 'Admin') {
+            tickets = await Ticket.find().populate('user', 'name phone');
+        } else {
+            tickets = await Ticket.find({ user: userId }).populate('user', 'name phone');
+        }
+        
         res.status(200).json(tickets);
     } catch (error: any) {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });

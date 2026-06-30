@@ -30,3 +30,27 @@ class SummarizeRequest(BaseModel):
 
 class SummarizeResponse(BaseModel):
     summary: str
+
+# --- Translation Schemas ---
+class TranslateRequest(BaseModel):
+    text: str
+
+class TranslateResponse(BaseModel):
+    translated_text: str
+
+# --- Vision Schemas ---
+class VisionRequest(BaseModel):
+    uploaded_image_b64: str
+    product_image_b64: str
+
+class VisionResponse(BaseModel):
+    fraud_risk: float
+
+# --- Similarity Schemas ---
+class DuplicateRequest(BaseModel):
+    current_text: str
+    open_tickets_texts: list[str]
+
+class DuplicateResponse(BaseModel):
+    is_duplicate: bool
+    max_similarity: float

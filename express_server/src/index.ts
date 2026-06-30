@@ -1,24 +1,38 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+
 import connectDB from './config/db';
 import ticketRoutes from './routes/ticketRoutes';
-import customerRoutes from './routes/customerRoutes';
+import authRoutes from './routes/authRoutes';
+import { startFallbackPoller } from './services/fallbackPoller';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 2424;
 
-// Middleware
+// Security Middlewares
+app.use(helmet());
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // Increase limit for image uploads
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
 
 // Connect Database
 connectDB();
 
+// Start Background Services
+startFallbackPoller();
+
 // Routes
-app.use('/api/customers', customerRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
 
 // Health Endpoint

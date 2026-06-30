@@ -1,0 +1,11 @@
+/* App-level overrides — most styling lives in index.css and theme.ts */
+
+/* Remove any legacy vite template styles */
+.hero, #center, #next-steps, #spacer, #social, .ticks {
+  display: none !important;
+}
+
+/* Ensure full-height CRM layout */
+html, body, #root {
+  height: 100%;
+}

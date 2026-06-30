@@ -39,3 +39,30 @@ async def summarize_endpoint(request: SummarizeRequest):
         
     response = await get_summary_response(request.text)
     return response
+
+from engine.translation_engine import translate_to_english
+from engine.vision_engine import calculate_fraud_risk
+from engine.similarity_engine import check_duplicate
+from schemas import (
+    TranslateRequest, TranslateResponse,
+    VisionRequest, VisionResponse,
+    DuplicateRequest, DuplicateResponse
+)
+
+# --- Multilingual Route ---
+@router.post("/translate", response_model=TranslateResponse, tags=["Multilingual"])
+async def translate_endpoint(request: TranslateRequest):
+    translated = await translate_to_english(request.text)
+    return {"translated_text": translated}
+
+# --- Vision Route ---
+@router.post("/vision-fraud", response_model=VisionResponse, tags=["Vision"])
+async def vision_fraud_endpoint(request: VisionRequest):
+    risk = await calculate_fraud_risk(request.uploaded_image_b64, request.product_image_b64)
+    return {"fraud_risk": risk}
+
+# --- Duplicate Check Route ---
+@router.post("/duplicate-check", response_model=DuplicateResponse, tags=["Similarity"])
+async def duplicate_check_endpoint(request: DuplicateRequest):
+    result = await check_duplicate(request.current_text, request.open_tickets_texts)
+    return result

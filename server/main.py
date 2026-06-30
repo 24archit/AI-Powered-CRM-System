@@ -17,6 +17,17 @@ async def lifespan(app: FastAPI):
     # Load RAG Models
     load_rag_models()
 
+    from engine.translation_engine import load_translation_models
+    from engine.vision_engine import load_vision_models
+    from engine.similarity_engine import load_similarity_models
+
+    logger.info("Loading translation models...")
+    load_translation_models()
+    logger.info("Loading vision models...")
+    load_vision_models()
+    logger.info("Loading similarity models...")
+    load_similarity_models()
+
     logger.info("System Ready.")
     
     yield  # Yield control to FastAPI app
