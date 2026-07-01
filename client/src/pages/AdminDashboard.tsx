@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CircularProgress, Button } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
@@ -6,32 +6,48 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend,
+  PieChart, Pie, Cell, Legend, AreaChart, Area,
+  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
+  ComposedChart, Line, ScatterChart, Scatter, ZAxis, LineChart
 } from 'recharts';
 import IntelligentQueue from '../components/IntelligentQueue';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import PeopleIcon from '@mui/icons-material/People';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 
 const EXPRESS_URL = 'http://localhost:2424';
 
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+const COLORS = ['#1c39bb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 const NAV_ITEMS = [
-  { icon: '📊', label: 'Dashboard', active: true },
-  { icon: '🎫', label: 'Tickets Queue', badge: null },
-  { icon: '👥', label: 'Customers', badge: null },
-  { icon: '🤖', label: 'AI Insights', badge: null },
-  { icon: '📈', label: 'Analytics', badge: null },
-  { icon: '⚙️', label: 'Settings', badge: null },
+  { icon: <DashboardIcon fontSize="small" />, label: 'Dashboard', active: true },
+  { icon: <ListAltIcon fontSize="small" />, label: 'Tickets Queue', badge: null },
+  { icon: <PeopleIcon fontSize="small" />, label: 'Customers', badge: null },
+  { icon: <SmartToyIcon fontSize="small" />, label: 'AI Insights', badge: null },
+  { icon: <ShowChartIcon fontSize="small" />, label: 'Analytics', badge: null },
+  { icon: <SettingsIcon fontSize="small" />, label: 'Settings', badge: null },
 ];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload?.length) {
     return (
       <div style={{
-        background: '#1e2130', border: '1px solid rgba(255,255,255,0.1)',
+        background: '#ffffff', border: '1px solid #e2e8f0',
         borderRadius: 10, padding: '10px 14px', fontSize: 13,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
       }}>
-        <div style={{ color: '#94a3b8', marginBottom: 4 }}>{label}</div>
-        <div style={{ color: '#f1f5f9', fontWeight: 700 }}>{payload[0].value}</div>
+        <div style={{ color: '#64748b', marginBottom: 4 }}>{label}</div>
+        <div style={{ color: '#0f172a', fontWeight: 700 }}>
+          {payload.map((p: any, i: number) => (
+            <div key={i} style={{ color: p.color }}>{p.name}: {p.value}</div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -41,6 +57,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
   const [activeNav, setActiveNav] = useState('Dashboard');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Scroll to top when tab changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeNav]);
 
   const { data: tickets, isLoading } = useQuery({
     queryKey: ['allTickets'],
@@ -70,24 +92,96 @@ const AdminDashboard = () => {
   }, {});
   const barData = Object.keys(sentimentCount || {}).map(k => ({ name: k, count: sentimentCount[k] }));
 
+  // Ticket Volume Trend (Area Chart)
+  const areaData = [
+    { time: '08:00', volume: 12 }, { time: '10:00', volume: 19 },
+    { time: '12:00', volume: 30 }, { time: '14:00', volume: 24 },
+    { time: '16:00', volume: 35 }, { time: '18:00', volume: 20 },
+  ];
+
+  // AI Confidence Scores (Radar Chart)
+  const radarData = [
+    { subject: 'Categorization', A: 92, fullMark: 100 },
+    { subject: 'Sentiment', A: 88, fullMark: 100 },
+    { subject: 'Fraud', A: 95, fullMark: 100 },
+    { subject: 'Resolution', A: 85, fullMark: 100 },
+    { subject: 'Deduplication', A: 90, fullMark: 100 },
+  ];
+  
+  // Resolution Performance (Composed Chart)
+  const composedData = [
+    { name: 'Mon', time: 24, count: 40 },
+    { name: 'Tue', time: 20, count: 50 },
+    { name: 'Wed', time: 15, count: 65 },
+    { name: 'Thu', time: 18, count: 55 },
+    { name: 'Fri', time: 12, count: 80 },
+  ];
+
+  // 5. Auto-Resolution Rate
+  const autoResolutionData = [
+    { day: 'Mon', rate: 75 },
+    { day: 'Tue', rate: 82 },
+    { day: 'Wed', rate: 85 },
+    { day: 'Thu', rate: 79 },
+    { day: 'Fri', rate: 91 },
+  ];
+
+  // 6. Fraud Risk Distribution
+  const fraudData = [
+    { range: '0-20%', count: 45 },
+    { range: '20-40%', count: 12 },
+    { range: '40-60%', count: 5 },
+    { range: '60-80%', count: 3 },
+    { range: '80-100%', count: 8 },
+  ];
+
+  // 7. CSAT Trend
+  const csatData = [
+    { month: 'Jan', score: 4.2 },
+    { month: 'Feb', score: 4.5 },
+    { month: 'Mar', score: 4.7 },
+    { month: 'Apr', score: 4.6 },
+    { month: 'May', score: 4.8 },
+  ];
+
+  // 8. AI Categorization Accuracy (Scatter)
+  const accuracyData = [
+    { category: 1, accuracy: 90, volume: 200 },
+    { category: 2, accuracy: 95, volume: 150 },
+    { category: 3, accuracy: 88, volume: 300 },
+    { category: 4, accuracy: 92, volume: 120 },
+    { category: 5, accuracy: 98, volume: 80 },
+  ];
+
   const kpis = [
-    { label: 'Total Tickets', value: totalTickets, icon: '🎫', color: 'primary', change: '+12% this week' },
-    { label: 'Fraud Alerts', value: highFraud, icon: '🛡️', color: 'danger', change: `${totalTickets ? ((highFraud / totalTickets) * 100).toFixed(0) : 0}% of total` },
-    { label: 'Duplicates', value: duplicates, icon: '📋', color: 'warning', change: 'Semantic matches' },
-    { label: 'Resolved', value: resolved, icon: '✅', color: 'success', change: `${totalTickets ? ((resolved / totalTickets) * 100).toFixed(0) : 0}% resolution rate` },
+    { label: 'Total Tickets', value: totalTickets, color: 'primary', change: '+12% this week', icon: <ListAltIcon /> },
+    { label: 'Fraud Alerts', value: highFraud, color: 'danger', change: `${totalTickets ? ((highFraud / totalTickets) * 100).toFixed(0) : 0}% of total`, icon: <SmartToyIcon /> },
+    { label: 'Duplicates', value: duplicates, color: 'warning', change: 'Semantic matches', icon: <PeopleIcon /> },
+    { label: 'Resolved', value: resolved, color: 'success', change: `${totalTickets ? ((resolved / totalTickets) * 100).toFixed(0) : 0}% resolution rate`, icon: <ShowChartIcon /> },
   ];
 
   return (
     <div className="crm-layout">
+      {/* Mobile Overlay */}
+      <div 
+        className={`crm-mobile-overlay ${mobileMenuOpen ? 'active' : ''}`}
+        onClick={() => setMobileMenuOpen(false)}
+      />
+
       {/* Sidebar */}
-      <aside className="crm-sidebar">
+      <aside className={`crm-sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         {/* Logo */}
         <div className="crm-sidebar-logo">
-          <div className="crm-sidebar-logo-icon">⚡</div>
-          <div>
-            <div className="crm-sidebar-logo-text">Agentic CRM</div>
-            <div className="crm-sidebar-logo-sub">AI Operations</div>
+          <div className="crm-sidebar-logo-text" style={{ fontSize: 26, fontWeight: 900, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center' }}>
+            <span style={{ color: '#ffffff' }}>Sentia</span>
+            <span style={{ 
+              background: 'linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%)', 
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>.ai</span>
           </div>
+          <div className="crm-sidebar-logo-sub" style={{ marginLeft: 2, marginTop: 4 }}>AI-Powered CRM for E-Commerce</div>
         </div>
 
         {/* Navigation */}
@@ -97,15 +191,18 @@ const AdminDashboard = () => {
             <div
               key={item.label}
               className={`crm-nav-item ${activeNav === item.label ? 'active' : ''}`}
-              onClick={() => setActiveNav(item.label)}
+              onClick={() => {
+                setActiveNav(item.label);
+                setMobileMenuOpen(false);
+              }}
             >
               <span className="nav-icon">{item.icon}</span>
               <span>{item.label}</span>
               {item.label === 'Tickets Queue' && totalTickets > 0 && (
                 <span className="crm-nav-badge">{totalTickets}</span>
               )}
-              {item.label === 'Fraud Alerts' && highFraud > 0 && (
-                <span className="crm-nav-badge" style={{ background: 'rgba(239,68,68,0.2)', color: '#f87171' }}>{highFraud}</span>
+              {item.label === 'Dashboard' && highFraud > 0 && (
+                <span className="crm-nav-badge" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>{highFraud}</span>
               )}
             </div>
           ))}
@@ -116,10 +213,10 @@ const AdminDashboard = () => {
           {highFraud > 0 && (
             <div style={{
               padding: '12px 14px', borderRadius: 10, marginBottom: 6,
-              background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+              background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.1)',
             }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#f87171', marginBottom: 4 }}>🚨 Fraud Alerts</div>
-              <div style={{ fontSize: 11, color: '#94a3b8' }}>{highFraud} ticket{highFraud !== 1 ? 's' : ''} require review</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#ef4444', marginBottom: 4 }}>Fraud Alerts</div>
+              <div style={{ fontSize: 11, color: '#64748b' }}>{highFraud} ticket{highFraud !== 1 ? 's' : ''} require review</div>
             </div>
           )}
         </div>
@@ -127,14 +224,14 @@ const AdminDashboard = () => {
         {/* User Footer */}
         <div className="crm-sidebar-footer">
           <div className="crm-user-card" onClick={logout} title="Click to logout">
-            <div className="crm-user-avatar">
+            <div className="crm-user-avatar" style={{ background: '#1c39bb' }}>
               {user?.name?.[0]?.toUpperCase() || 'A'}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="crm-user-name truncate">{user?.name || 'Admin'}</div>
               <div className="crm-user-role">Administrator</div>
             </div>
-            <span style={{ fontSize: 16, color: '#64748b' }}>→</span>
+            <LogoutIcon fontSize="small" style={{ color: '#64748b' }} />
           </div>
         </div>
       </aside>
@@ -143,9 +240,12 @@ const AdminDashboard = () => {
       <main className="crm-main">
         {/* Top Bar */}
         <div className="crm-topbar">
+          <button className="crm-mobile-hamburger" onClick={() => setMobileMenuOpen(true)}>
+            <MenuIcon />
+          </button>
           <div>
-            <div className="crm-topbar-title">Agentic Insights</div>
-            <div className="crm-topbar-subtitle">Real-time AI operations overview</div>
+            <div className="crm-topbar-title">Sentia Dashboard</div>
+            <div className="crm-topbar-subtitle">Analyze AI performance, customer sentiment, and flagged fraud risks.</div>
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
             {/* Live indicator */}
@@ -159,158 +259,270 @@ const AdminDashboard = () => {
                 boxShadow: '0 0 8px #10b981', display: 'inline-block',
                 animation: 'pulse-dot 2s infinite',
               }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#34d399' }}>Live</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#10b981' }}>Live</span>
             </div>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={logout}
-              sx={{ fontSize: 12, py: 0.7, px: 2 }}
-            >
-              Sign Out
-            </Button>
           </div>
         </div>
 
         {/* Page Content */}
         <div className="crm-content">
-          {/* KPI Cards */}
-          <div className="crm-kpi-grid">
-            {kpis.map((kpi, i) => (
-              <motion.div
-                key={kpi.label}
-                className={`crm-kpi-card ${kpi.color}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08 }}
-              >
-                <div className="crm-kpi-label">{kpi.label}</div>
-                <div className="crm-kpi-value">
-                  {isLoading ? <CircularProgress size={24} color="inherit" /> : kpi.value}
-                </div>
-                <div className="crm-kpi-change text-muted" style={{ fontSize: 12 }}>
-                  {kpi.change}
-                </div>
-                <div className="crm-kpi-icon" style={{
-                  background: kpi.color === 'primary' ? 'rgba(99,102,241,0.1)'
-                    : kpi.color === 'danger' ? 'rgba(239,68,68,0.1)'
-                      : kpi.color === 'warning' ? 'rgba(245,158,11,0.1)'
-                        : 'rgba(16,185,129,0.1)',
-                }}>
-                  {kpi.icon}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Charts */}
-          <div className="crm-charts-grid">
-            {/* Bar Chart */}
+          
+          {activeNav === 'Dashboard' && (
             <motion.div
-              className="crm-card"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
             >
-              <div className="crm-card-header">
-                <div>
-                  <div className="crm-card-title">Sentiment Analysis</div>
-                  <div className="crm-card-subtitle">Customer sentiment distribution</div>
-                </div>
+              {/* KPI Cards */}
+              <div className="crm-kpi-grid">
+                {kpis.map((kpi, i) => (
+                  <motion.div
+                    key={kpi.label}
+                    className={`crm-kpi-card ${kpi.color}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                  >
+                    <div className="crm-kpi-label">{kpi.label}</div>
+                    <div className="crm-kpi-value">
+                      {isLoading ? <CircularProgress size={24} color="inherit" /> : kpi.value}
+                    </div>
+                    <div className="crm-kpi-change text-muted" style={{ fontSize: 12 }}>
+                      {kpi.change}
+                    </div>
+                    <div className="crm-kpi-icon" style={{
+                      color: kpi.color === 'primary' ? '#1c39bb'
+                        : kpi.color === 'danger' ? '#ef4444'
+                          : kpi.color === 'warning' ? '#f59e0b'
+                            : '#10b981',
+                      background: kpi.color === 'primary' ? 'rgba(28,57,187,0.1)'
+                        : kpi.color === 'danger' ? 'rgba(239,68,68,0.1)'
+                          : kpi.color === 'warning' ? 'rgba(245,158,11,0.1)'
+                            : 'rgba(16,185,129,0.1)',
+                    }}>
+                      {kpi.icon}
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-              <div className="crm-card-body" style={{ height: 260 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barData} barSize={28}>
-                    <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                    <RechartsTooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-                    <Bar dataKey="count" fill="url(#barGradient)" radius={[6, 6, 0, 0]}>
-                      {barData.map((_, index) => (
-                        <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Bar>
-                    <defs>
-                      <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#6366f1" />
-                        <stop offset="100%" stopColor="#8b5cf6" />
-                      </linearGradient>
-                    </defs>
-                  </BarChart>
-                </ResponsiveContainer>
+
+              {/* Charts */}
+              <div className="crm-charts-grid">
+                
+                {/* Area Chart: Ticket Volume */}
+                <div className="crm-card">
+                  <div className="crm-card-header">
+                    <div>
+                      <div className="crm-card-title">Ticket Volume</div>
+                      <div className="crm-card-subtitle">Intake trends over time</div>
+                    </div>
+                  </div>
+                  <div className="crm-card-body" style={{ height: 260 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={areaData}>
+                        <defs>
+                          <linearGradient id="colorVolume" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#1c39bb" stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor="#1c39bb" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <XAxis dataKey="time" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <RechartsTooltip content={<CustomTooltip />} />
+                        <Area type="monotone" dataKey="volume" stroke="#1c39bb" fillOpacity={1} fill="url(#colorVolume)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Composed Chart: Resolution Performance */}
+                <div className="crm-card">
+                  <div className="crm-card-header">
+                    <div>
+                      <div className="crm-card-title">Resolution Performance</div>
+                      <div className="crm-card-subtitle">Time-to-resolve vs Ticket Volume</div>
+                    </div>
+                  </div>
+                  <div className="crm-card-body" style={{ height: 260 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={composedData}>
+                        <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <YAxis yAxisId="left" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <YAxis yAxisId="right" orientation="right" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <RechartsTooltip content={<CustomTooltip />} />
+                        <Bar yAxisId="left" dataKey="count" fill="#cbd5e1" radius={[4, 4, 0, 0]} barSize={20} />
+                        <Line yAxisId="right" type="monotone" dataKey="time" stroke="#10b981" strokeWidth={3} dot={{ r: 4 }} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Bar Chart: Sentiment */}
+                <div className="crm-card">
+                  <div className="crm-card-header">
+                    <div>
+                      <div className="crm-card-title">Sentiment Analysis</div>
+                      <div className="crm-card-subtitle">Customer sentiment distribution</div>
+                    </div>
+                  </div>
+                  <div className="crm-card-body" style={{ height: 300 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={barData} barSize={28}>
+                        <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <RechartsTooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.03)' }} />
+                        <Bar dataKey="count" fill="#1c39bb" radius={[6, 6, 0, 0]}>
+                          {barData.map((_, index) => (
+                            <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Radar Chart: AI Confidence */}
+                <div className="crm-card">
+                  <div className="crm-card-header">
+                    <div>
+                      <div className="crm-card-title">AI Confidence Scores</div>
+                      <div className="crm-card-subtitle">Model accuracy across modules</div>
+                    </div>
+                  </div>
+                  <div className="crm-card-body" style={{ height: 300 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                        <PolarGrid stroke="#e2e8f0" />
+                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 11 }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#cbd5e1', fontSize: 10 }} />
+                        <Radar name="Confidence" dataKey="A" stroke="#10b981" fill="#10b981" fillOpacity={0.4} />
+                        <RechartsTooltip content={<CustomTooltip />} />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* 5. Pie Chart: Category Distribution */}
+                <div className="crm-card">
+                  <div className="crm-card-header">
+                    <div>
+                      <div className="crm-card-title">Category Distribution</div>
+                      <div className="crm-card-subtitle">Ticket breakdown by AI category</div>
+                    </div>
+                  </div>
+                  <div className="crm-card-body" style={{ height: 300 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={pieData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={3} dataKey="value">
+                          {pieData.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <RechartsTooltip content={<CustomTooltip />} />
+                        <Legend iconType="circle" iconSize={8} formatter={(value) => <span style={{ color: '#64748b', fontSize: 12 }}>{value}</span>} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* 6. Line Chart: Auto-Resolution Rate */}
+                <div className="crm-card">
+                  <div className="crm-card-header">
+                    <div>
+                      <div className="crm-card-title">Auto-Resolution Rate</div>
+                      <div className="crm-card-subtitle">AI autonomous handling %</div>
+                    </div>
+                  </div>
+                  <div className="crm-card-body" style={{ height: 300 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={autoResolutionData}>
+                        <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <RechartsTooltip content={<CustomTooltip />} />
+                        <Line type="monotone" dataKey="rate" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* 7. Bar Chart: Fraud Risk Distribution */}
+                <div className="crm-card">
+                  <div className="crm-card-header">
+                    <div>
+                      <div className="crm-card-title">Fraud Risk Distribution</div>
+                      <div className="crm-card-subtitle">Risk level thresholds across tickets</div>
+                    </div>
+                  </div>
+                  <div className="crm-card-body" style={{ height: 300 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={fraudData} barSize={24} layout="vertical">
+                        <XAxis type="number" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <YAxis type="category" dataKey="range" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <RechartsTooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.03)' }} />
+                        <Bar dataKey="count" fill="#ef4444" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* 8. Line Chart: CSAT Trend */}
+                <div className="crm-card">
+                  <div className="crm-card-header">
+                    <div>
+                      <div className="crm-card-title">Customer Satisfaction</div>
+                      <div className="crm-card-subtitle">CSAT score trend over time</div>
+                    </div>
+                  </div>
+                  <div className="crm-card-body" style={{ height: 300 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={csatData}>
+                        <XAxis dataKey="month" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <YAxis domain={[3.5, 5]} tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                        <RechartsTooltip content={<CustomTooltip />} />
+                        <Line type="monotone" dataKey="score" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: '#10b981' }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+
               </div>
             </motion.div>
+          )}
 
-            {/* Pie Chart */}
+          {activeNav === 'Tickets Queue' && (
             <motion.div
-              className="crm-card"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
             >
-              <div className="crm-card-header">
-                <div>
-                  <div className="crm-card-title">Category Distribution</div>
-                  <div className="crm-card-subtitle">Ticket breakdown by AI category</div>
+              {/* Intelligent Triage Queue */}
+              <div className="crm-card" style={{ height: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column' }}>
+                <div className="crm-card-header" style={{ flexShrink: 0 }}>
+                  <div>
+                    <div className="crm-card-title">Intelligent Triage Queue</div>
+                    <div className="crm-card-subtitle">AI-prioritized tickets with fraud & duplicate detection</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    {highFraud > 0 && (
+                      <span className="crm-badge fraud">
+                        <span className="crm-badge-dot" />
+                        {highFraud} Fraud
+                      </span>
+                    )}
+                    {duplicates > 0 && (
+                      <span className="crm-badge duplicate">
+                        <span className="crm-badge-dot" />
+                        {duplicates} Duplicate
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="crm-card-body" style={{ height: 260 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData} cx="50%" cy="50%"
-                      innerRadius={65} outerRadius={100}
-                      paddingAngle={4} dataKey="value"
-                    >
-                      {pieData.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <RechartsTooltip content={<CustomTooltip />} />
-                    <Legend
-                      iconType="circle"
-                      iconSize={8}
-                      formatter={(value) => (
-                        <span style={{ color: '#94a3b8', fontSize: 12, fontWeight: 500 }}>{value}</span>
-                      )}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div style={{ overflow: 'auto', flex: 1 }}>
+                  <IntelligentQueue tickets={tickets} isLoading={isLoading} />
+                </div>
               </div>
             </motion.div>
-          </div>
+          )}
 
-          {/* Intelligent Triage Queue */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <div className="crm-card">
-              <div className="crm-card-header">
-                <div>
-                  <div className="crm-card-title">🎯 Intelligent Triage Queue</div>
-                  <div className="crm-card-subtitle">AI-prioritized tickets with fraud & duplicate detection</div>
-                </div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  {highFraud > 0 && (
-                    <span className="crm-badge fraud">
-                      <span className="crm-badge-dot" />
-                      {highFraud} Fraud
-                    </span>
-                  )}
-                  {duplicates > 0 && (
-                    <span className="crm-badge duplicate">
-                      <span className="crm-badge-dot" />
-                      {duplicates} Duplicate
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div style={{ overflowX: 'auto' }}>
-                <IntelligentQueue tickets={tickets} isLoading={isLoading} />
-              </div>
-            </div>
-          </motion.div>
         </div>
       </main>
     </div>

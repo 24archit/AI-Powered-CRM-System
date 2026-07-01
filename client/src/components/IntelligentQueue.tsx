@@ -25,7 +25,6 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
         textAlign: 'center', padding: '60px 40px',
         color: '#64748b', fontSize: 14,
       }}>
-        <div style={{ fontSize: 36, marginBottom: 12 }}>📭</div>
         No tickets found in the queue.
       </div>
     );
@@ -41,7 +40,8 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
 
   return (
     <>
-      <table className="crm-table">
+      <div className="crm-table-container">
+        <table className="crm-table">
         <thead>
           <tr>
             <th style={{ paddingLeft: 22 }}>Subject</th>
@@ -55,7 +55,7 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
         </thead>
         <tbody>
           <AnimatePresence>
-            {tickets.map((ticket: any, index: number) => {
+            {[...tickets].reverse().map((ticket: any, index: number) => {
               const isHighFraud = ticket.fraudRisk > 0.5;
               const isAngry = ticket.aiSentiment === 'Negative' || ticket.aiSentiment === 'Angry';
               const isDuplicate = ticket.isDuplicate;
@@ -67,6 +67,8 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.04 }}
                   className={`${isHighFraud ? 'fraud-row' : isDuplicate ? 'duplicate-row' : ''}`}
+                  onClick={() => setSelectedTicket(ticket)}
+                  style={{ cursor: 'pointer' }}
                 >
                   <td style={{ paddingLeft: 22, maxWidth: 240 }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
@@ -77,7 +79,7 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
                         }} />
                       )}
                       <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: '#f1f5f9', marginBottom: 3 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', marginBottom: 3 }}>
                           {ticket.subject}
                         </div>
                         <div style={{
@@ -99,7 +101,7 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
                       }}>
                         {ticket.user?.name?.[0]?.toUpperCase() || '?'}
                       </div>
-                      <span style={{ fontSize: 13, color: '#cbd5e1' }}>{ticket.user?.name || 'Unknown'}</span>
+                      <span style={{ fontSize: 13, color: '#475569' }}>{ticket.user?.name || 'Unknown'}</span>
                     </div>
                   </td>
                   <td>
@@ -124,7 +126,6 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
                         color: sentimentColor(ticket.aiSentiment),
                         fontSize: 12, fontWeight: 600,
                       }}>
-                        {isAngry ? '😠' : ticket.aiSentiment === 'Positive' ? '😊' : '😐'}
                         {ticket.aiSentiment}
                       </span>
                     ) : (
@@ -136,7 +137,7 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{
                           width: 56, height: 5, borderRadius: 3,
-                          background: 'rgba(255,255,255,0.06)', overflow: 'hidden',
+                          background: 'rgba(0,0,0,0.06)', overflow: 'hidden',
                         }}>
                           <div style={{
                             height: '100%', borderRadius: 3,
@@ -208,14 +209,15 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
             })}
           </AnimatePresence>
         </tbody>
-      </table>
+        </table>
+      </div>
 
       {/* Detail Dialog */}
       <Dialog open={!!selectedTicket} onClose={() => setSelectedTicket(null)} maxWidth="md" fullWidth>
-        <DialogTitle sx={{ pb: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <DialogTitle sx={{ pb: 1, pt: { xs: 2, sm: 3 }, px: { xs: 2, sm: 3 } }}>
+          <div className="crm-dialog-header-flex">
             <div>
-              <div style={{ fontSize: 17, fontWeight: 700, color: '#f1f5f9' }}>
+              <div style={{ fontSize: 17, fontWeight: 700, color: '#0f172a' }}>
                 {selectedTicket?.subject}
               </div>
               <div style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
@@ -232,7 +234,7 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
             </span>
           </div>
         </DialogTitle>
-        <DialogContent dividers>
+        <DialogContent dividers sx={{ p: { xs: 2, sm: 3 } }}>
           {/* Description */}
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
@@ -240,49 +242,49 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
             </div>
             <div style={{
               padding: '14px 16px', borderRadius: 10,
-              background: 'rgba(255,255,255,0.02)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              fontSize: 14, color: '#cbd5e1', lineHeight: 1.65,
+              background: 'rgba(0,0,0,0.02)',
+              border: '1px solid rgba(0,0,0,0.06)',
+              fontSize: 14, color: '#475569', lineHeight: 1.65,
             }}>
               {selectedTicket?.description}
             </div>
           </div>
 
-          {/* AI Metrics */}
+          {/* AI Analysis Grid */}
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
-              AI Analytics
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
+              AI Analysis & Categorization
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            <div className="crm-ai-analysis-grid">
               {[
                 {
-                  label: 'Category',
-                  value: selectedTicket?.aiCategory || '—',
-                  color: '#818cf8',
-                  bg: 'rgba(99,102,241,0.06)',
+                  label: 'Predicted Category',
+                  value: selectedTicket?.aiCategory || 'Processing...',
+                  color: '#1c39bb',
+                  bg: 'rgba(28,57,187,0.06)',
                 },
                 {
                   label: 'Sentiment',
                   value: selectedTicket?.aiSentiment || '—',
                   color: selectedTicket?.aiSentiment === 'Negative' || selectedTicket?.aiSentiment === 'Angry'
-                    ? '#f87171'
-                    : selectedTicket?.aiSentiment === 'Positive' ? '#34d399' : '#94a3b8',
+                    ? '#ef4444'
+                    : selectedTicket?.aiSentiment === 'Positive' ? '#10b981' : '#475569',
                   bg: selectedTicket?.aiSentiment === 'Negative' || selectedTicket?.aiSentiment === 'Angry'
                     ? 'rgba(239,68,68,0.06)'
-                    : selectedTicket?.aiSentiment === 'Positive' ? 'rgba(16,185,129,0.06)' : 'rgba(255,255,255,0.02)',
+                    : selectedTicket?.aiSentiment === 'Positive' ? 'rgba(16,185,129,0.06)' : 'rgba(0,0,0,0.02)',
                 },
                 {
                   label: 'Fraud Risk',
                   value: selectedTicket?.fraudRisk != null
                     ? `${(selectedTicket.fraudRisk * 100).toFixed(1)}%`
                     : '—',
-                  color: selectedTicket?.fraudRisk > 0.5 ? '#f87171' : '#34d399',
+                  color: selectedTicket?.fraudRisk > 0.5 ? '#ef4444' : '#10b981',
                   bg: selectedTicket?.fraudRisk > 0.5 ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.06)',
                 },
               ].map(item => (
                 <div key={item.label} style={{
                   padding: '16px', borderRadius: 10, textAlign: 'center',
-                  background: item.bg, border: '1px solid rgba(255,255,255,0.06)',
+                  background: item.bg, border: '1px solid rgba(0,0,0,0.06)',
                 }}>
                   <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
                     {item.label}
@@ -300,7 +302,7 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
             <div style={{ marginBottom: 20 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ fontSize: 12, color: '#64748b' }}>Fraud Risk Score</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: selectedTicket.fraudRisk > 0.5 ? '#f87171' : '#34d399' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: selectedTicket.fraudRisk > 0.5 ? '#ef4444' : '#10b981' }}>
                   {(selectedTicket.fraudRisk * 100).toFixed(1)}%
                 </span>
               </div>
@@ -320,25 +322,25 @@ const IntelligentQueue = ({ tickets, isLoading }: { tickets: any; isLoading: boo
 
           {/* AI Draft */}
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
               Agentic Auto-Draft Response
             </div>
             <div className="crm-ai-panel">
-              <div className="crm-ai-label">
-                <span className="crm-ai-label-dot" />
+              <div className="crm-ai-label" style={{ color: '#1c39bb' }}>
                 RAG-Powered Response Draft
               </div>
-              <div style={{ fontSize: 14, color: '#c7d2fe', lineHeight: 1.65 }}>
+              <div style={{ fontSize: 14, color: '#334155', lineHeight: 1.65 }}>
                 {selectedTicket?.aiSuggestedResponse || 'No response generated yet.'}
               </div>
             </div>
           </div>
         </DialogContent>
-        <DialogActions sx={{ p: 3, gap: 1 }}>
-          <Button onClick={() => setSelectedTicket(null)} sx={{ color: '#94a3b8' }}>
+        <DialogActions sx={{ p: { xs: 2, sm: 3 }, gap: 1, flexWrap: 'wrap', justifyContent: { xs: 'center', sm: 'flex-end' } }}>
+          <Button size="small" onClick={() => setSelectedTicket(null)} sx={{ color: '#64748b' }}>
             Close
           </Button>
           <Button
+            size="small"
             variant="contained"
             color="primary"
             onClick={() => setSelectedTicket(null)}
